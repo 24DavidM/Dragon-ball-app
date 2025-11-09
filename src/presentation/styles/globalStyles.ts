@@ -27,6 +27,42 @@ export const globalStyles = StyleSheet.create({
     marginVertical: 16,
     textAlign: "center",
   },
+  idCard:{
+    fontSize: 10,
+    fontWeight: "600",
+    color: Colors.secondary,
+    marginBottom: 8,
+    position: 'absolute',
+    top: 4,
+    right: 8,
+
+  },
+  subtitle:{
+    fontSize: 15,
+    fontWeight: "600",
+    color: Colors.secondary,
+    marginBottom: 12,
+  },
+  subcontainer:{
+    display: "flex",
+    flexDirection: "column",
+    marginHorizontal:15,
+    width: '90%',
+
+  },
+
+  searchInput:{
+    height: 40,
+    borderColor: Colors.border,
+    
+    margin:"auto",
+    width: '100%',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    color: Colors.text,
+    marginBottom: 16,
+  },
   container: {
     flex: 1,
     backgroundColor: Colors.background,

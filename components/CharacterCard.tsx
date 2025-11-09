@@ -11,7 +11,7 @@ interface CharacterCardProps {
 
 export const CharacterCard: React.FC<CharacterCardProps> = ({ character }) => {
     const router = useRouter();
-
+    
     const handlePress = () => {
         router.push(`/character/${character.id}`);
     };
@@ -30,13 +30,18 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({ character }) => {
             />
 
             <View style={globalStyles.characterInfo}>
+                <Text style={globalStyles.idCard}>Código del personaje: {character.id}</Text>
                 <Text style={globalStyles.characterName} numberOfLines={1}>
-                    {character.name}
+                    {character.name} 
                 </Text>
                 <Text style={globalStyles.characterRace}>
                     {character.race} • {character.gender}
                 </Text>
+
                 <Text style={globalStyles.characterKi}>Ki: {character.ki}</Text>
+                <Text style={globalStyles.characterKi}>Máximo Ki: {character.maxKi}</Text>
+
+
             </View>
         </TouchableOpacity>
     );

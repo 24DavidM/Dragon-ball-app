@@ -1,53 +1,81 @@
 import { useEffect, useState } from "react";
 import { CharacterService } from "../../data/services/character.service";
 import { Character } from "../../domain/models/Character.model";
-import { Transformation } from "../../domain/models/Transformation.model";
 
 /**
- * Hook para manejar el detalle de un personaje y sus transformaciones
+ * Hook personalizado para manejar la lista de personajes
  *
- * Las transformaciones vienen incluidas en el objeto del personaje
- * desde el endpoint /characters/{id}
+ * Responsabilidades:
+ * - Obtener lista de personajes
+ * - Manejar estados de carga
+ * - Manejar errores
+ * - Implementar paginación
  */
-export const useCharacterDetail = (characterId: number) => {
-    const [character, setCharacter] = useState<Character | null>(null);
-    const [transformations, setTransformations] = useState<Transformation[]>([]);
+export const useCharacters = (initialPage: number = 1) => {
+    const [characters, setCharacters] = useState<Character[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [page, setPage] = useState<number>(initialPage);
+    const [hasMore, setHasMore] = useState<boolean>(true);
 
-    useEffect(() => {
-        const fetchCharacterData = async () => {
-            try {
-                setLoading(true);
-                setError(null);
+    /**
+     * Función para cargar personajes
+     */
+    const fetchCharacters = async (pageNumber: number) => {
+        try {
+            setLoading(true);
+            setError(null);
 
-                // Obtener datos del personaje (incluye transformaciones)
-                const characterData = await CharacterService.getCharacterById(
-                    characterId
-                );
-                setCharacter(characterData);
+            const response = await CharacterService.getCharacters(pageNumber, 10);
 
-                // Las transformaciones ya vienen en el objeto del personaje
-                setTransformations(characterData.transformations || []);
-            } catch (err) {
-                setError("Error al cargar detalles del personaje.");
-                console.error("Error crítico:", err);
-            } finally {
-                setLoading(false);
+            if (pageNumber === 1) {
+                setCharacters(response.items);
+            } else {
+                // Agregar más personajes (paginación)
+                setCharacters((prev) => [...prev, ...response.items]);
             }
-        };
 
-        // Ejecutar la carga de datos solo si hay un characterId válido
-        if (characterId) {
-            fetchCharacterData();
+            // Verificar si hay más páginas
+            setHasMore(response.meta.currentPage < response.meta.totalPages);
+        } catch (err) {
+            setError("Error al cargar personajes. Intenta nuevamente.");
+            console.error(err);
+        } finally {
+            setLoading(false);
         }
-    }, [characterId]);
+    };
+
+    /**
+     * Cargar más personajes (siguiente página)
+     */
+    const loadMore = () => {
+        if (!loading && hasMore) {
+            const nextPage = page + 1;
+            setPage(nextPage);
+            fetchCharacters(nextPage);
+        }
+    };
+
+    /**
+     * Recargar personajes (pull to refresh)
+     */
+    const refresh = () => {
+        setPage(1);
+        fetchCharacters(1);
+    };
+
+    // Cargar personajes al montar el componente
+    useEffect(() => {
+        fetchCharacters(page);
+    }, []);
 
     return {
-        character,
-        transformations,
+        characters,
         loading,
         error,
+        loadMore,
+        refresh,
+        hasMore,
     };
 };
 
