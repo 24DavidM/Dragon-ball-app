@@ -11,7 +11,7 @@ import { globalStyles } from "../../src/presentation/styles/globalStyles";
  * Pantalla principal de personajes
  */
 export default function CharactersScreen() {
-  const { characters, loading, error, loadMore, refresh } = useCharacters();
+  const { characters, loading, error, loadMore, refresh, search, setSearch } = useCharacters();
 
   // Estado de carga inicial
   if (loading && characters.length === 0) {
@@ -41,6 +41,17 @@ export default function CharactersScreen() {
   return (
     <View style={globalStyles.container}>
       <Text style={globalStyles.title}>Personajes de Dragon Ball</Text>
+      <View style={globalStyles.searchContainer}>
+        <TextInput
+          style={globalStyles.searchInput}
+          placeholder="Buscar por nombre..."
+          placeholderTextColor="#888"
+          value={search}
+          onChangeText={setSearch}
+          autoCorrect={false}
+          autoCapitalize="none"
+        />
+      </View>
       <FlatList
         data={characters}
         keyExtractor={(item) => item.id.toString()}

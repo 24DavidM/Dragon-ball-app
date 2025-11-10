@@ -9,14 +9,18 @@ export class CharacterService {
     /**
      * ENDPOINT 1: Obtener lista de personajes con paginación
      * GET /characters?page={page}&limit={limit}
+     * GET /characters?name={name}&page={page}&limit={limit}
      */
     static async getCharacters(
         page: number = 1,
-        limit: number = 10
+        limit: number = 10,
+        name?: string
     ): Promise<CharactersResponse> {
         try {
+            const params: any = { page, limit };
+            if (name) params.name = name;
             const response = await apiClient.get<CharactersResponse>("/characters", {
-                params: { page, limit },
+                params,
             });
             return response.data;
         } catch (error) {

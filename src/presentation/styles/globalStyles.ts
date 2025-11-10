@@ -50,11 +50,16 @@ export const globalStyles = StyleSheet.create({
     width: '90%',
 
   },
+searchContainer:{
+    width: '90%',
+    margin: "auto",
+    marginBottom: 16,
+  },
+
 
   searchInput:{
     height: 40,
     borderColor: Colors.border,
-    
     margin:"auto",
     width: '100%',
     borderWidth: 1,

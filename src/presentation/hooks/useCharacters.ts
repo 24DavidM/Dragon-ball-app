@@ -21,27 +21,36 @@ export const useCharacters = (initialPage: number = 1) => {
 
 
     /**
-     * Función para cargar personajes
+     * Función para cargar personajes y buscar por nombre personaje 
      */
-    const fetchCharacters = async (pageNumber: number) => {
+    const fetchCharacters = async (pageNumber: number, searchName: string = "") => {
         try {
             setLoading(true);
             setError(null);
 
-            const response = await CharacterService.getCharacters(pageNumber, 10);
+            const response = await CharacterService.getCharacters(pageNumber, 10, searchName);
 
+            // Si la respuesta es un array 
+            if (Array.isArray(response)) {
+                setCharacters(response);
+                setHasMore(false);
+                return;
+            }
+            // Si la respuesta es paginada
+            if (!response || !response.meta || !response.items) {
+                setCharacters([]);
+                setHasMore(false);
+                return;
+            }
             if (pageNumber === 1) {
                 setCharacters(response.items);
             } else {
-                // Agregar más personajes (paginación)
                 setCharacters((prev) => [...prev, ...response.items]);
             }
-
-            // Verificar si hay más páginas
             setHasMore(response.meta.currentPage < response.meta.totalPages);
         } catch (err) {
             setError("Error al cargar personajes. Intenta nuevamente.");
-            console.error(err);
+            console.error('Error en fetchCharacters:', err);
         } finally {
             setLoading(false);
         }
@@ -54,7 +63,7 @@ export const useCharacters = (initialPage: number = 1) => {
         if (!loading && hasMore) {
             const nextPage = page + 1;
             setPage(nextPage);
-            fetchCharacters(nextPage);
+            fetchCharacters(nextPage, search);
         }
     };
 
@@ -63,7 +72,7 @@ export const useCharacters = (initialPage: number = 1) => {
      */
     const refresh = () => {
         setPage(1);
-        fetchCharacters(1);
+        fetchCharacters(1, search);
     };
     /*
     * Busqueda de personajes por nombre
@@ -73,8 +82,9 @@ export const useCharacters = (initialPage: number = 1) => {
 
     // Cargar personajes al montar el componente
     useEffect(() => {
-        fetchCharacters(page);
-    }, []);
+        setPage(1);
+        fetchCharacters(1, search);
+    }, [search]);
 
     return {
         characters,
@@ -83,5 +93,7 @@ export const useCharacters = (initialPage: number = 1) => {
         loadMore,
         refresh,
         hasMore,
+        search,
+        setSearch,
     };
 };
